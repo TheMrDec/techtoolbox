@@ -5,9 +5,3 @@ ForEach ($module in $modules) {
     Write-Host $module.FullName
     Import-Module $module.FullName
 }
-
-Pause
-
-Get-Command -ListImported 
-
-Pause
