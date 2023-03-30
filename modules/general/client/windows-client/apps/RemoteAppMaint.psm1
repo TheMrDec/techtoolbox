@@ -30,3 +30,14 @@ param (
     $Appslist | Export-Clixml -Path $XMLPath\$($MachineName)\InstalledApps.xml
     notepad.exe $XMLPath\$($MachineName)\InstalledApps.xml
 }
+
+function Remove-ListedApps {
+param (
+    [Parameter(mandatory)][string] $MachineName
+)
+    $RunningDirectory = Get-Location
+    $AppsToRemove = Get-Content $RunningDirectory\AppsToRemove.xml
+    
+}
+
+Export-ModuleMember -Function Get-InstalledApps, Write-InstalledAppstoXML, Remove-ListedApps
