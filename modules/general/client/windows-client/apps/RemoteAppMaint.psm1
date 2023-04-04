@@ -20,23 +20,51 @@ param(
     return($AppsList)
 }
 
-function Write-InstalledAppstoXML {
+function Write-InstalledAppstoFile {
 param (
     [Parameter(mandatory)][string] $MachineName,
     [string] $InfoLevel,
     [Parameter(mandatory)][string] $XMLPath
 )
     Get-InstalledApps $MachineName $InfoLevel
-    $Appslist | Export-Clixml -Path $XMLPath\$($MachineName)\InstalledApps.xml
-    notepad.exe $XMLPath\$($MachineName)\InstalledApps.xml
+    $Appslist | ConvertTo-Json -depth 100 | Out-File "$XMLPath\$($MachineName)\InstalledApps.json"
+    # Enable below line to debug bad JSON exports/imports
+    # notepad.exe $XMLPath\$($MachineName)\InstalledApps.json
 }
 
 function Remove-ListedApps {
 param (
     [Parameter(mandatory)][string] $MachineName
 )
-    $RunningDirectory = Get-Location
-    $AppsToRemove = Get-Content $RunningDirectory\AppsToRemove.xml
+
+    try {
+        $AppsToRemove = Get-Content -Raw -Path .\AppsToRemove.json | ConvertFrom-Json
+    }
+    catch {
+        Write-Host "AppsToRemove.json was not found or could not be read. `n Please verify that the file exists and can be read by the current user."
+        Write-Output $_
+    }
+
+    try {
+        Get-InstalledApps -MachineName $MachineName -InfoLevel 0
+    }
+    catch {
+        Write-Host "$($MachineName) could not be contacted via remote command. `n Please verify that the machine is powered on."
+        Write-Output $_
+    }
+
+    ForEach ($App in $AppsToRemove){
+        $SelectedApp = $AppsList | Where-Object {$_.Name -eq "$App"}
+
+        try {
+            Invoke-Command -ComputerName $MachineName -ScriptBlock {$SelectedApp.Uninstall()}
+        }
+        catch {
+            Write-Host "Could not remove $App. Consult the logfile for more details."
+        }
+
+        
+    }
     
 }
 
