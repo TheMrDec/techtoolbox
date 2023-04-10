@@ -10,3 +10,7 @@ ForEach ($module in $modules) {
     Write-Host $module.FullName
     Import-Module $module.FullName
 }
+
+
+
+Stop-Transcript
