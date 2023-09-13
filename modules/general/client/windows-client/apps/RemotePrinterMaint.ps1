@@ -1,7 +1,5 @@
-#TODO 
-
-# Temporary fix for machine list not being populated.
 $DistrictID = "001"
+# Can drill down farther into OU structure if you want to be very specific
 $IncludeOU = "UN"
 # Comma delimited list of printers to hunt. Using shortened names may cause unwanted behavior or may not work at all.
 $PrinterList = ""
