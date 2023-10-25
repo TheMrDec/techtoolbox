@@ -1,6 +1,6 @@
 function New-VNCLinks {
     $VNCDIR = "\\server1\UPDATE$\QNSOU\VNCLINKS\TEST"
-    $VNCContent = (Get-Content .\Desktop\VNCCONFIG.json | Out-String | ConvertFrom-Json)
+    $VNCContent = (Get-Content .\VNCCONFIG.json | Out-String | ConvertFrom-Json)
 
     New-Item -ItemType Directory -Path $VNCDIR 
 
@@ -10,14 +10,14 @@ function New-VNCLinks {
         $computerName = $computer.Name
         $OPDir = "$VNCDIR\$($computerName.Substring(0,8))"
         New-Item -ItemType Directory -Path $OPDir -ErrorAction SilentlyContinue
-
+    
         New-Item -Path $OPDir -ItemType File -Name "$computerName.vnc"
         $VNCContent.connection[0] = "host=$computerName"
-        $VNCContent.connection = $VNCContent.connection -join "`n"
-        $VNCContent.options = $VNCContent.options -join "`n"
-        $Payload = "[connection]`n$($VNCContent.connection)`n[options]`n$($VNCContent.options)`n"
+        $VNCConnectionData = $VNCContent.connection -join "`n"
+        $VNCOptionData = $VNCContent.options -join "`n"
+        $Payload = "[connection]`n$VNCConnectionData`n[options]`n$VNCOptionData`n"
         Set-Content -Path "$OPDir\$computerName.vnc" -Value $Payload -ErrorAction SilentlyContinue
-        
+    
     }
 
 }
